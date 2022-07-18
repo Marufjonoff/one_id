@@ -88,8 +88,10 @@ class _OneIDState extends State<OneID> {
 
   void apiGetUserInfo() async {
     String? response = await DioService.post(api: "/sso/oauth/Authorization.do", params: queryUserInfo());
+
     if(response != null) {
       setState((){
+        _webViewController.clearCache();
         widget.onUserInfo(response);
       });
     } else {
