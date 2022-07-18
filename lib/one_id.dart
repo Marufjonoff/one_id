@@ -44,7 +44,7 @@ class _OneIDState extends State<OneID> {
   void apiGetCode(String url) async {
     if(url.contains("code=")) {
       setState((){
-        code = url.substring(url.indexOf("code=") + 1, url.indexOf("&state"));
+        code = url.substring(url.indexOf("code=") + 5, url.indexOf("&state"));
       });
       apiGetToken();
     }
@@ -113,6 +113,9 @@ class _OneIDState extends State<OneID> {
              apiGetCode(value),
             }
           });
+        },
+        onPageFinished: (_) {
+          _webViewController.clearCache();
         },
         onWebResourceError: (error){
           if(kDebugMode) {
