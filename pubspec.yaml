@@ -3,7 +3,7 @@ description: This is package for get user info with id.egov.uz
 version: 0.0.5
 homepage: https://github.com/Marufjonoff/one_id
 authors:
-  - Obidjon Ma'rufjonov
+  - Creator <marufjonovobidjon91@gmail.com>
 
 environment:
   sdk: ">=2.17.5 <3.0.0"
