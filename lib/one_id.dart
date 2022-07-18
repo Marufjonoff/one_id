@@ -6,7 +6,8 @@ import 'package:one_id/dio_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class OneID extends StatefulWidget {
-  const OneID({Key? key,
+  const OneID({
+    Key? key,
     required this.token,
     required this.code,
     required this.userInfo,
@@ -27,23 +28,24 @@ class _OneIDState extends State<OneID> {
   late WebViewController _webViewController;
   late String code;
   late String access_token;
-  
+
   @override
   void initState() {
     super.initState();
-    if(defaultTargetPlatform == TargetPlatform.android) {
-      urlOneId = "https://sso.egov.uz/sso/oauth/Authorization.do?response_type=${widget.code.response_type}&client_id=${widget.code.client_id}&redirect_uri=${widget.code.redirect_uri}&scope=${widget.code.scope}&state=${widget.code.state}";
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      urlOneId =
+          "https://sso.egov.uz/sso/oauth/Authorization.do?response_type=${widget.code.response_type}&client_id=${widget.code.client_id}&redirect_uri=${widget.code.redirect_uri}&scope=${widget.code.scope}&state=${widget.code.state}";
       WebView.platform = AndroidWebView();
-
-    } else if(defaultTargetPlatform == TargetPlatform.iOS) {
-      urlOneId = "https://sso.egov.uz/sso/oauth/Authorization.do?response_type=${widget.code.response_type}&client_id=${widget.code.client_id}&redirect_uri=${widget.code.redirect_uri}&scope=${widget.code.scope}&state=${widget.code.state}";
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      urlOneId =
+          "https://sso.egov.uz/sso/oauth/Authorization.do?response_type=${widget.code.response_type}&client_id=${widget.code.client_id}&redirect_uri=${widget.code.redirect_uri}&scope=${widget.code.scope}&state=${widget.code.state}";
       WebView.platform = CupertinoWebView();
     }
   }
-  
+
   void apiGetCode(String url) async {
-    if(url.contains("code=")) {
-      setState((){
+    if (url.contains("code=")) {
+      setState(() {
         code = url.substring(url.indexOf("code=") + 5, url.indexOf("&state"));
       });
       apiGetToken();
@@ -61,11 +63,12 @@ class _OneIDState extends State<OneID> {
     };
     return map;
   }
-  
-  void apiGetToken() async {
-    String? response = await DioService.post(api: "/sso/oauth/Authorization.do", params: queryToken());
-    if(response != null) {
-      setState((){
+
+  Future<void> apiGetToken() async {
+    String? response = await DioService.post(
+        api: "/sso/oauth/Authorization.do", params: queryToken());
+    if (response != null) {
+      setState(() {
         access_token = jsonDecode(response)['access_token'];
       });
     } else {
@@ -86,10 +89,11 @@ class _OneIDState extends State<OneID> {
   }
 
   void apiGetUserInfo() async {
-    String? response = await DioService.post(api: "/sso/oauth/Authorization.do", params: queryUserInfo());
+    String? response = await DioService.post(
+        api: "/sso/oauth/Authorization.do", params: queryUserInfo());
 
-    if(response != null) {
-      setState((){
+    if (response != null) {
+      setState(() {
         _webViewController.clearCache();
         widget.onUserInfo(response);
       });
@@ -109,17 +113,16 @@ class _OneIDState extends State<OneID> {
           await _webViewController.clearCache();
         },
         onProgress: (_) async {
-          await _webViewController.currentUrl().then((value) => {
-            if(value != null) {
-             apiGetCode(value),
-            }
-          });
+          final url = await _webViewController.currentUrl();
+          if (url != null) {
+            apiGetCode(url);
+          }
         },
-        onPageFinished: (_){
+        onPageFinished: (_) {
           apiGetUserInfo();
         },
-        onWebResourceError: (error){
-          if(kDebugMode) {
+        onWebResourceError: (error) {
+          if (kDebugMode) {
             log("Error");
           }
         },
@@ -164,10 +167,10 @@ class GetUserInfo {
   final String client_secret;
   final String scope;
 
-  GetUserInfo({required this.grant_type,
+  GetUserInfo({
+    required this.grant_type,
     required this.client_id,
     required this.scope,
     required this.client_secret,
   });
-
 }
