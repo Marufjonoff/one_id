@@ -1,3 +1,3 @@
-## 0.0.2
+## 0.0.3
 
-OneId get user info
+One ID User info

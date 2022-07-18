@@ -1,8 +1,8 @@
+import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:one_id/services/dio_service.dart';
+import 'package:one_id/dio_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class OneID extends StatefulWidget {
@@ -10,11 +10,13 @@ class OneID extends StatefulWidget {
     required this.token,
     required this.code,
     required this.userInfo,
+    required this.onUserInfo,
   }) : super(key: key);
 
-  final Code code;
-  final Token token;
-  final UserInfo userInfo;
+  final GetCode code;
+  final GetToken token;
+  final GetUserInfo userInfo;
+  final Function(String? userInfo) onUserInfo;
 
   @override
   State<OneID> createState() => _OneIDState();
@@ -25,8 +27,7 @@ class _OneIDState extends State<OneID> {
   late WebViewController _webViewController;
   late String code;
   late String access_token;
-
-
+  
   @override
   void initState() {
     // TODO: implement initState
@@ -45,8 +46,8 @@ class _OneIDState extends State<OneID> {
     if(url.contains("code=")) {
       setState((){
         code = url.substring(url.indexOf("code=") + 1, url.indexOf("&state"));
-        apiGetToken();
       });
+      apiGetToken();
     }
   }
 
@@ -65,9 +66,12 @@ class _OneIDState extends State<OneID> {
   void apiGetToken() async {
     String? response = await DioService.post(api: "/sso/oauth/Authorization.do", params: queryToken());
     if(response != null) {
-      log("Token => $response");
+      setState((){
+        access_token = jsonDecode(response)['access_token'];
+      });
+      apiGetUserInfo();
     } else {
-      log("Error");
+      log("Get token error");
     }
   }
 
@@ -84,12 +88,13 @@ class _OneIDState extends State<OneID> {
   }
 
   void apiGetUserInfo() async {
-    String? response = await DioService.get(api: "/sso/oauth/Authorization.do", params: queryUserInfo());
+    String? response = await DioService.post(api: "/sso/oauth/Authorization.do", params: queryUserInfo());
     if(response != null) {
-      setState((){});
-      log(response);
+      setState((){
+        widget.onUserInfo(response);
+      });
     } else {
-      log("Error");
+      log("User info error");
     }
   }
 
@@ -112,7 +117,7 @@ class _OneIDState extends State<OneID> {
         },
         onWebResourceError: (error){
           if(kDebugMode) {
-            print("Error");
+            log("Error");
           }
         },
       ),
@@ -120,8 +125,8 @@ class _OneIDState extends State<OneID> {
   }
 }
 
-class Code {
-  const Code({
+class GetCode {
+  const GetCode({
     required this.response_type,
     required this.client_id,
     required this.redirect_uri,
@@ -136,8 +141,8 @@ class Code {
   final String state;
 }
 
-class Token {
-  Token({
+class GetToken {
+  GetToken({
     required this.grant_type,
     required this.client_id,
     required this.client_secret,
@@ -150,13 +155,13 @@ class Token {
   final String redirect_uri;
 }
 
-class UserInfo {
+class GetUserInfo {
   final String grant_type;
   final String client_id;
   final String client_secret;
   final String scope;
 
-  UserInfo({required this.grant_type,
+  GetUserInfo({required this.grant_type,
     required this.client_id,
     required this.scope,
     required this.client_secret,
