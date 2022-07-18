@@ -1,6 +1,6 @@
 name: one_id
 description: This is package for get user info with id.egov.uz
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/Marufjonoff/one_id
 
 environment:
