@@ -1,7 +1,7 @@
 name: one_id
 description: This is package for get user info with id.egov.uz
 version: 0.0.1
-homepage:
+homepage: https://github.com/Marufjonoff/one_id
 
 environment:
   sdk: ">=2.17.5 <3.0.0"

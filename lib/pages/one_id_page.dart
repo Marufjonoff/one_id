@@ -1,8 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:one_id/models/get_code_model.dart';
-import 'package:one_id/models/get_token_model.dart';
-import 'package:one_id/models/get_user_info.dart';
 import 'package:one_id/services/dio_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -25,6 +24,8 @@ class _OneIDState extends State<OneID> {
   late String urlOneId;
   late WebViewController _webViewController;
   late String code;
+  late String access_token;
+
 
   @override
   void initState() {
@@ -63,11 +64,10 @@ class _OneIDState extends State<OneID> {
   
   void apiGetToken() async {
     String? response = await DioService.post(api: "/sso/oauth/Authorization.do", params: queryToken());
-
     if(response != null) {
-      print(response);
+      log("Token => $response");
     } else {
-      print("Error");
+      log("Error");
     }
   }
 
@@ -78,7 +78,7 @@ class _OneIDState extends State<OneID> {
       "client_id": widget.userInfo.client_id,
       "client_secret": widget.userInfo.client_secret,
       "scope": widget.userInfo.scope,
-      "access_token": widget.userInfo.access_token,
+      "access_token": access_token,
     };
     return map;
   }
@@ -86,9 +86,10 @@ class _OneIDState extends State<OneID> {
   void apiGetUserInfo() async {
     String? response = await DioService.get(api: "/sso/oauth/Authorization.do", params: queryUserInfo());
     if(response != null) {
-      print(response);
+      setState((){});
+      log(response);
     } else {
-      print("Error");
+      log("Error");
     }
   }
 
@@ -117,4 +118,48 @@ class _OneIDState extends State<OneID> {
       ),
     );
   }
+}
+
+class Code {
+  const Code({
+    required this.response_type,
+    required this.client_id,
+    required this.redirect_uri,
+    required this.scope,
+    required this.state,
+  });
+
+  final String response_type;
+  final String client_id;
+  final String redirect_uri;
+  final String scope;
+  final String state;
+}
+
+class Token {
+  Token({
+    required this.grant_type,
+    required this.client_id,
+    required this.client_secret,
+    required this.redirect_uri,
+  });
+
+  final String grant_type;
+  final String client_id;
+  final String client_secret;
+  final String redirect_uri;
+}
+
+class UserInfo {
+  final String grant_type;
+  final String client_id;
+  final String client_secret;
+  final String scope;
+
+  UserInfo({required this.grant_type,
+    required this.client_id,
+    required this.scope,
+    required this.client_secret,
+  });
+
 }
