@@ -68,7 +68,6 @@ class _OneIDState extends State<OneID> {
       setState((){
         access_token = jsonDecode(response)['access_token'];
       });
-      apiGetUserInfo();
     } else {
       log("Get token error");
     }
@@ -115,6 +114,9 @@ class _OneIDState extends State<OneID> {
              apiGetCode(value),
             }
           });
+        },
+        onPageFinished: (_){
+          apiGetUserInfo();
         },
         onWebResourceError: (error){
           if(kDebugMode) {
