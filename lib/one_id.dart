@@ -114,9 +114,6 @@ class _OneIDState extends State<OneID> {
             }
           });
         },
-        onPageFinished: (_) {
-          _webViewController.clearCache();
-        },
         onWebResourceError: (error){
           if(kDebugMode) {
             log("Error");
